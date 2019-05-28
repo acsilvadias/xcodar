@@ -2,8 +2,10 @@ package br.com.hannasocial;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.media.MediaMetadataCompatApi21;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.FocusFinder;
@@ -15,11 +17,26 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.tasks.Task;
+
 import java.nio.file.Paths;
 
 public class MainActivity extends AppCompatActivity {
+    /* Verificar GPS*/
+    private static final int REQUEST_CHECK_GPS = 2;
+    private static final String EXTRA_DIALOG = "dialog";
 
+    Handler mHandler;
+    boolean mShowDialog;
+    int mAttempts;
 
+    /* Componentes */
     private CheckBox chkBoxKeepAnonimous;
     private CheckBox chkBoxBeAvailable;
     private TextView txtViewPeoplesAvailable;
@@ -28,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mHandler = new Handler();
+        mShowDialog = savedInstanceState == null;
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -36,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Inciar troca de mensagens agora!", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Iniciar troca de mensagens agora!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -81,6 +102,33 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(EXTRA_DIALOG,mShowDialog);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState){
+        super.onRestoreInstanceState(savedInstanceState);
+        mShowDialog = savedInstanceState.getBoolean(EXTRA_DIALOG, true);
+    }
+
+    private void checkStatusGPS(){
+        final LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationSettingsRequest.Builder locationSettingsRequest =
+                new LocationSettingsRequest.Builder();
+        locationSettingsRequest.setAlwaysShow(true);
+        locationSettingsRequest.addLocationRequest(locationRequest);
+
+        /*Task<LocationSettingsResult> result =
+                LocationServices.getSettingsClient(this).checkLocationSettings(locationSettingsRequest.build());*/
+
+
 
     }
 

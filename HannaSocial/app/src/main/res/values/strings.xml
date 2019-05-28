@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Hanna Social</string>
+    <string name="action_settings">Settings</string>
+    <string name="app_single_name">Alertar Incidente</string>
+    <string name="btn_anonimousAlert">Pedir Ajuda</string>
+    <string name="chkBox_keepAnonymous">Continuar Anônimo</string>
+    <string name="txtPeoplesToHelpYou">8 pessoas Próxima</string>
+    <string name="choBox_ficardisponivel">Deseja ficar disponível na região?</string>
+    <string name="imgnpeopleshelpyou">Hanna Proples Help You</string>
+    <string name="imghannapeoplestalkyou">Pessoas do Hanna conversam com você</string>
+    <string name="predominantcolor">colorAccent</string>
+    <string name="itemcolor">colorAccent</string>
+    <string name="backgroundcolor">cardview_light_background</string>
+</resources>

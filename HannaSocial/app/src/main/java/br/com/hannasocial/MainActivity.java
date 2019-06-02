@@ -1,12 +1,17 @@
 package br.com.hannasocial;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
+import android.location.SettingInjectorService;
 import android.os.Bundle;
 
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -24,39 +29,45 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 
 import java.nio.file.Paths;
 
+import static com.google.android.gms.location.LocationServices.*;
+
 public class MainActivity extends AppCompatActivity {
     /* Verificar GPS*/
     private static final int REQUEST_CHECK_GPS = 2;
     private static final String EXTRA_DIALOG = "dialog";
 
-    protected Location mLastLocation;
-
-    Handler mHandler;
-    boolean mShowDialog;
-    int mAttempts;
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     /* Componentes */
+    private Button btnAnonimousAlert;
     private CheckBox chkBoxKeepAnonimous;
     private CheckBox chkBoxBeAvailable;
     private TextView txtViewPeoplesAvailable;
 
-   private FusedLocationProviderClient fusedLocationProviderClient;
+    Handler mHandler;
+    boolean mShowDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestPermission();
+
+        verifyStatusGps();
 
         mHandler = new Handler();
         mShowDialog = savedInstanceState == null;
@@ -74,20 +85,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button btnAnonimousAlert = findViewById(R.id.btn_anonimousAlert);
-        //btnAnonimousAlert = (Button)findViewById(R.id.btn_anonimousAlert);
+
+
+        btnAnonimousAlert = (Button)findViewById(R.id.btn_anonimousAlert);
         chkBoxKeepAnonimous = (CheckBox) findViewById(R.id.chkBoxKeepAnonimous);
         chkBoxBeAvailable = (CheckBox) findViewById(R.id.chkBoxBeAvailable);
         txtViewPeoplesAvailable = (TextView) findViewById(R.id.txtViewPeoplesAvailable);
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+
         /* Criar os respectivos eventos */
         btnAnonimousAlert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-            checkStatusGPS();
-          //messageToast(getApplicationContext(), "Não Implementado!", 3);
+             checkLocatioinGPS();
+            //messageToast(getApplicationContext(), "Não Implementado!", 3);
 
             }
         });
@@ -114,21 +127,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        fusedLocationProviderClient = getFusedLocationProviderClient(this);
+
     }
 
+
     @Override
-    public void onSaveInstanceState(Bundle outState){
+    protected void onSaveInstanceState(Bundle outState){
         super.onSaveInstanceState(outState);
         outState.putBoolean(EXTRA_DIALOG,mShowDialog);
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState){
+    protected void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
         mShowDialog = savedInstanceState.getBoolean(EXTRA_DIALOG, true);
     }
 
-    private void checkStatusGPS(){
+
+    private void verifyStatusGps() {
+        /*  Não implementado! */
+    }
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                1);
+    }
+
+    private void checkLocatioinGPS(){
         Log.i("xcodar","checkStatusGPS >>> ");
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -136,18 +162,17 @@ public class MainActivity extends AppCompatActivity {
             Log.i("xcodar","return <<<< ");
             return;
         }
-        Task<Location> task = fusedLocationProviderClient.getLastLocation();
+        Task<Location> task;
+        task = fusedLocationProviderClient.getLastLocation();
         task.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if(location!=null) {
-                    //Write your implemenation here
-                    Log.d("AndroidClarified","Localidade" + location.getLatitude()+" "+location.getLongitude());      }
+                   CharSequence responseLocation = "Localidade LAT: " + location.getLatitude()+" LON: "+location.getLongitude();
+                   messageToast(MainActivity.this, responseLocation,5 );
+                   Log.d("AndroidClarified","Localidade" + location.getLatitude()+" "+location.getLongitude());      }
             }
         });
-
-
-
     }
 
     @Override
@@ -181,5 +206,12 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
+    /* Enviar e consumir api rest */
 
+    private void sendLocation(){
+        Log.i("xcodar","sendLocation >>> ");
+
+
+        Log.i("xcodar","sendLocation <<< ");
+    }
 }

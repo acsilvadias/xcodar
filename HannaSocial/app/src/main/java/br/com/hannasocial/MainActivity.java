@@ -1,17 +1,12 @@
 package br.com.hannasocial;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
-import android.location.SettingInjectorService;
 import android.os.Bundle;
 
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -19,7 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.FocusFinder;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,21 +21,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-
-
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-
-
-import java.nio.file.Paths;
 
 import static com.google.android.gms.location.LocationServices.*;
 
@@ -49,6 +31,23 @@ public class MainActivity extends AppCompatActivity {
     /* Verificar GPS*/
     private static final int REQUEST_CHECK_GPS = 2;
     private static final String EXTRA_DIALOG = "dialog";
+
+    private String objId="";
+    private String deviceId = "";
+    private String longitude = "";
+    private String latitude = "";
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+    public String getDeviceId() {
+        return deviceId;
+    }
+
 
     private FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -168,11 +167,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Location location) {
                 if(location!=null) {
+                   latitude = Double.toString(location.getLatitude());
+                   longitude = Double.toString(location.getLongitude());
+                    sendLocation();
                    CharSequence responseLocation = "Localidade LAT: " + location.getLatitude()+" LON: "+location.getLongitude();
                    messageToast(MainActivity.this, responseLocation,5 );
-                   Log.d("AndroidClarified","Localidade" + location.getLatitude()+" "+location.getLongitude());      }
+                }else
+                {
+                    sendLocation();
+
+                }
+                Log.d("AndroidClarified","Localidade" + location.getLatitude()+" "+location.getLongitude());
             }
         });
+        Log.i("xcodar","checkStatusGPS <<< ");
+
     }
 
     @Override
@@ -208,10 +217,20 @@ public class MainActivity extends AppCompatActivity {
 
     /* Enviar e consumir api rest */
 
-    private void sendLocation(){
+    private void sendLocation() {
+
         Log.i("xcodar","sendLocation >>> ");
 
+        try{
+            LocationDevice locationdevice = new LocationDevice(getDeviceId(),getLatitude(),getLongitude());
 
-        Log.i("xcodar","sendLocation <<< ");
+            new LocationWebApi(this,locationdevice).canyouhelpme(locationdevice);
+
+        }catch (Exception e){
+            Log.i("xcodar","Error sendLocation: " + e.getMessage());
+        }finally {
+            Log.i("xcodar","sendLocation <<< ");
+        }
+
     }
 }

@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String EXTRA_DIALOG = "dialog";
 
     private String objId="";
-    private String deviceId = "";
+    private String deviceId = "+5581995922332";
     private String longitude = "";
     private String latitude = "";
 
@@ -169,16 +169,17 @@ public class MainActivity extends AppCompatActivity {
                 if(location!=null) {
                    latitude = Double.toString(location.getLatitude());
                    longitude = Double.toString(location.getLongitude());
-                    sendLocation();
+                    SendLocation();
                    CharSequence responseLocation = "Localidade LAT: " + location.getLatitude()+" LON: "+location.getLongitude();
                    messageToast(MainActivity.this, responseLocation,5 );
                 }else
                 {
-                    sendLocation();
+                    SendLocation();
 
                 }
                 Log.d("AndroidClarified","Localidade" + location.getLatitude()+" "+location.getLongitude());
             }
+
         });
         Log.i("xcodar","checkStatusGPS <<< ");
 
@@ -217,19 +218,19 @@ public class MainActivity extends AppCompatActivity {
 
     /* Enviar e consumir api rest */
 
-    private void sendLocation() {
+    protected void SendLocation() {
 
-        Log.i("xcodar","sendLocation >>> ");
+        Log.i("xcodar","SendLocation >>> ");
 
         try{
             LocationDevice locationdevice = new LocationDevice(getDeviceId(),getLatitude(),getLongitude());
 
-            new LocationWebApi(this,locationdevice).canyouhelpme(locationdevice);
+            new LocationWebApi(this,locationdevice).execute();
 
         }catch (Exception e){
-            Log.i("xcodar","Error sendLocation: " + e.getMessage());
+            Log.i("xcodar","Error SendLocation: " + e.getMessage());
         }finally {
-            Log.i("xcodar","sendLocation <<< ");
+            Log.i("xcodar","SendLocation <<< ");
         }
 
     }

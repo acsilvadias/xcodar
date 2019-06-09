@@ -4,20 +4,36 @@ import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+
+import android.os.AsyncTask;
 import android.util.Log;
 
-public class LocationWebApi {
-    public static final String server = "http://192.168.11.3:3003/api";
+import static java.util.Calendar.*;
+
+public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>        {
+    public static final String server = "http://192.168.11.3:3003/api/locationDevices";
     private static final String mWebApi = server ;
     private Context mContext;
+    private LocationDevice _locationdevice;
+
+    @Override
+    protected Void doInBackground(LocationDevice... locationDevices) {
+        canyouhelpme(_locationdevice);
+        return null;
+    }
 
     public LocationWebApi(Context ctx, LocationDevice locationdevice ){
         mContext = ctx;
-
+        _locationdevice = locationdevice;
     }
 
     public void canyouhelpme(LocationDevice locationdevice)  {
@@ -41,11 +57,10 @@ public class LocationWebApi {
     private boolean sendLocation(String methodHttp , LocationDevice location) {
         Log.i("xcodar","LocationApi.sendLocation >>>");
         boolean success = false;
-        boolean doOutPut = !"DELETE".equals(methodHttp);
         String url = server;
         URL urlCon;
         HttpURLConnection client;
-
+        BufferedReader reader = null;
 
         try {
             urlCon = new URL(url);
@@ -64,9 +79,24 @@ public class LocationWebApi {
             OutputStream outputPost = client.getOutputStream();
             outputPost.write(writeStream(outputPost, location));
             outputPost.flush();
-            outputPost.close();
+
+            if (client.getResponseCode() == HttpURLConnection.HTTP_CREATED){
+                reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line = null;
+                while((line = reader.readLine()) != null)
+                {
+                    // Append server response in string
+                    sb.append(line + "\n");
+                }
+                Log.i("xcodar",sb.toString());
+            }
+
+            Log.i( "xcodar", Integer.toString(client.getResponseCode()));
+
 
             client.disconnect();
+            outputPost.close();
             success = true;
         }catch (Exception e){
             Log.i("xcodar","Error: " + e.getMessage());
@@ -76,19 +106,23 @@ public class LocationWebApi {
             return success;
         }
 
-
     }
 
     private byte[] writeStream(OutputStream outputPost, LocationDevice location) throws JSONException {
         JSONObject jl = new JSONObject();
         Date date = new Date();
+        Locale local = new Locale("pt", "BR");
+        Date currentTime = getInstance(local).getTime();
         jl.put("deviceId", location.get_deviceId());
         jl.put("longitude", location.get_longitude());
         jl.put("latitude", location.get_latitude());
-        jl.put("latitude",date);
+        jl.put("dataTimeLocation", currentTime.toString());
 
         String json = jl.toString();
         return json.getBytes();
 
     }
+
+
+
 }

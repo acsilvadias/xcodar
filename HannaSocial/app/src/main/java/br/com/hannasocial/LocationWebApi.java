@@ -20,7 +20,11 @@ import android.util.Log;
 import static java.util.Calendar.*;
 
 public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>        {
-    public static final String server = "http://192.168.11.3:3003/api/locationDevices";
+    /*
+    * DNS IPV4: ec2-18-222-248-86.us-east-2.compute.amazonaws.com
+    * LOCAL: "http://192.168.11.3:3003/api/locationDevices"
+    * */
+    public static final String server = "http://ec2-18-222-248-86.us-east-2.compute.amazonaws.com:3003/api/locationDevices";
     private static final String mWebApi = server ;
     private Context mContext;
     private LocationDevice _locationdevice;
@@ -50,8 +54,6 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
        }finally {
            Log.i("xcodar","canyouhelpme <<<<");
        }
-
-
     }
 
     private boolean sendLocation(String methodHttp , LocationDevice location) {

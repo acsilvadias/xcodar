@@ -8,4 +8,5 @@ const docLocationSchema = new mongoose.Schema({
     dataTimeLocation: {type: Date , required: true }
 })
 
-module.exports = restful.model('LocationDevice', docLocationSchema)
+
+module.exports = restful.model('LocationDevice', docLocationSchema )

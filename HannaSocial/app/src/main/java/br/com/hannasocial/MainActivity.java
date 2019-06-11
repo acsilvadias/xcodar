@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -31,21 +32,36 @@ public class MainActivity extends AppCompatActivity {
     /* Verificar GPS*/
     private static final int REQUEST_CHECK_GPS = 2;
     private static final String EXTRA_DIALOG = "dialog";
+    private TelephonyManager telephonyManager;
 
-    private String objId="";
-    private String deviceId = "+5581995922332";
-    private String longitude = "";
-    private String latitude = "";
+    private void setmDeviceId(String mDeviceId) {
+        this.mDeviceId = mDeviceId;
+    }
+
+    private void setmLongitude(String mLongitude) {
+        this.mLongitude = mLongitude;
+    }
+
+    private void setmLatitude(String mLatitude) {
+        this.mLatitude = mLatitude;
+    }
+
+    private String mDeviceId = "";
+    private String mLongitude = "";
+    private String mLatitude = "";
+
+    public MainActivity() {
+
+    }
 
     public String getLongitude() {
-        return longitude;
+        return mLongitude;
     }
-
     public String getLatitude() {
-        return latitude;
+        return mLatitude;
     }
     public String getDeviceId() {
-        return deviceId;
+        return mDeviceId;
     }
 
 
@@ -64,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        requestDeviceId();
         requestPermission();
-
         verifyStatusGps();
 
         mHandler = new Handler();
@@ -84,14 +100,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         btnAnonimousAlert = (Button)findViewById(R.id.btn_anonimousAlert);
         chkBoxKeepAnonimous = (CheckBox) findViewById(R.id.chkBoxKeepAnonimous);
         chkBoxBeAvailable = (CheckBox) findViewById(R.id.chkBoxBeAvailable);
         txtViewPeoplesAvailable = (TextView) findViewById(R.id.txtViewPeoplesAvailable);
-
-
 
         /* Criar os respectivos eventos */
         btnAnonimousAlert.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
                 if (!chkBoxKeepAnonimous.isChecked()) {
                     messageToast(getApplicationContext(), "Atencão, ao desmarcar esta opção você deixará de ser uma pessoal anônima!", 5);
                 }
-
             }
 
         });
@@ -130,6 +141,36 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void requestDeviceId() {
+       telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+            return;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+                        return;
+                    }
+                    String imeiNumber = telephonyManager.getDeviceId();
+                    this.setmDeviceId(imeiNumber);
+
+                    //Toast.makeText(MainActivity.this,imeiNumber,Toast.LENGTH_LONG).show();
+                } else {
+
+                    Toast.makeText(MainActivity.this,"Verificar Permissão!",Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState){
@@ -143,6 +184,17 @@ public class MainActivity extends AppCompatActivity {
         mShowDialog = savedInstanceState.getBoolean(EXTRA_DIALOG, true);
     }
 
+    private String getPhonyId() {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED)
+            if (android.os.Build.VERSION.SDK_INT < 26) {
+                return telephonyManager.getDeviceId();
+            } else {
+                return telephonyManager.getMeid();
+            }
+
+        return "+5581995922332";
+    }
 
     private void verifyStatusGps() {
         /*  Não implementado! */
@@ -166,18 +218,17 @@ public class MainActivity extends AppCompatActivity {
         task.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                if(location!=null) {
-                   latitude = Double.toString(location.getLatitude());
-                   longitude = Double.toString(location.getLongitude());
-                    SendLocation();
+                if(location != null) {
+                   setmLatitude(Double.toString(location.getLatitude()));
+                   setmLongitude(Double.toString(location.getLongitude()));
+                   SendLocation();
                    CharSequence responseLocation = "Localidade LAT: " + location.getLatitude()+" LON: "+location.getLongitude();
                    messageToast(MainActivity.this, responseLocation,5 );
                 }else
                 {
-                    SendLocation();
-
+                    messageToast(MainActivity.this, "Favor ativar o serviço de localização(GPS)!",5 );
                 }
-                Log.d("AndroidClarified","Localidade" + location.getLatitude()+" "+location.getLongitude());
+                Log.i("xcodar","Localidade" + location.getLatitude()+" "+location.getLongitude());
             }
 
         });

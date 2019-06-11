@@ -11,4 +11,5 @@
     <string name="predominantcolor">colorAccent</string>
     <string name="itemcolor">colorAccent</string>
     <string name="backgroundcolor">cardview_light_background</string>
+    <string name="messageativargps">Favor ativar o serviço de localização(GPS)!</string>
 </resources>

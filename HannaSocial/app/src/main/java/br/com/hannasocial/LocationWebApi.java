@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -111,16 +112,20 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
     }
 
     private byte[] writeStream(OutputStream outputPost, LocationDevice location) throws JSONException {
-        JSONObject jl = new JSONObject();
+        JSONObject jo = new JSONObject();
         Date date = new Date();
+
         Locale local = new Locale("pt", "BR");
         Date currentTime = getInstance(local).getTime();
-        jl.put("deviceId", location.get_deviceId());
-        jl.put("longitude", location.get_longitude());
-        jl.put("latitude", location.get_latitude());
-        jl.put("dataTimeLocation", currentTime.toString());
+        jo.put("deviceId", location.get_deviceId());
+        jo.put("longitude", location.get_longitude());
+        jo.put("latitude", location.get_latitude());
+        jo.put("dataTimeLocation", currentTime.toString());
+        jo.put("location.type", "Point");
+        jo.accumulate( "location.coordinates", location.get_longitude() );
+        jo.accumulate( "location.coordinates", location.get_latitude() );
 
-        String json = jl.toString();
+        String json = jo.toString();
         return json.getBytes();
 
     }

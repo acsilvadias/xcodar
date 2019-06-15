@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -23,6 +24,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
@@ -32,46 +34,36 @@ public class MainActivity extends AppCompatActivity {
     /* Verificar GPS*/
     private static final int REQUEST_CHECK_GPS = 2;
     private static final String EXTRA_DIALOG = "dialog";
-    private TelephonyManager telephonyManager;
+    private String mDeviceId = "";
+    private String mLongitude = "";
+    private String mLatitude = "";
+    private final ThreadLocal<TelephonyManager> telephonyManager = new ThreadLocal<TelephonyManager>();
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private String[] mPermissions ={Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_FINE_LOCATION };
+    /* Componentes */
+    private Button btnAnonimousAlert;
+    private CheckBox chkBoxKeepAnonimous;
+    private CheckBox chkBoxBeAvailable;
+    private TextView txtViewPeoplesAvailable;
 
     private void setmDeviceId(String mDeviceId) {
         this.mDeviceId = mDeviceId;
     }
-
     private void setmLongitude(String mLongitude) {
         this.mLongitude = mLongitude;
     }
-
     private void setmLatitude(String mLatitude) {
         this.mLatitude = mLatitude;
     }
 
-    private String mDeviceId = "";
-    private String mLongitude = "";
-    private String mLatitude = "";
-
-    public MainActivity() {
-
-    }
-
+    public MainActivity() {   }
     public String getLongitude() {
         return mLongitude;
     }
     public String getLatitude() {
         return mLatitude;
     }
-    public String getDeviceId() {
-        return mDeviceId;
-    }
-
-
-    private FusedLocationProviderClient fusedLocationProviderClient;
-
-    /* Componentes */
-    private Button btnAnonimousAlert;
-    private CheckBox chkBoxKeepAnonimous;
-    private CheckBox chkBoxBeAvailable;
-    private TextView txtViewPeoplesAvailable;
+    public String getmDeviceId() { return mDeviceId; }
 
     Handler mHandler;
     boolean mShowDialog;
@@ -80,9 +72,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestDeviceId();
         requestPermission();
-        verifyStatusGps();
+        requestDeviceId();
 
         mHandler = new Handler();
         mShowDialog = savedInstanceState == null;
@@ -111,9 +102,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
              checkLocatioinGPS();
-            //messageToast(getApplicationContext(), "Não Implementado!", 3);
-
-            }
+         }
         });
 
         chkBoxKeepAnonimous.setOnClickListener(new View.OnClickListener() {
@@ -139,38 +128,55 @@ public class MainActivity extends AppCompatActivity {
 
         fusedLocationProviderClient = getFusedLocationProviderClient(this);
 
+
     }
 
     private void requestDeviceId() {
-       telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+       telephonyManager.set((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+            Log.i("xcodar","return requestDeviceId()");
             return;
         }
+        Log.i("xcodar","requestDeviceId()");
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case 101:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                for (int i=0;i<grantResults.length;i++   ){
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED)
+                    {
+                        if (ActivityCompat.checkSelfPermission(this, permissions[i] ) != PackageManager.PERMISSION_GRANTED){
+                            Log.i("xcodar", "onRequestPermissionsResult()" + permissions[i] + " NOT PERMISSION_GRANTED");
+                        }else {
+                            Log.i("xcodar", "onRequestPermissionsResult()" + permissions[i] + " PERMISSION_GRANTED");
+                        }
+                    }else{
+                        Log.i("xcodar","onRequestPermissionsResult()" + permissions[i] + " NOT PERMISSION_GRANTED" );
+                    }
+                }
+
+            /*    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
+                        Log.i("xcodar"," return onRequestPermissionsResult()");
                         return;
                     }
-                    String imeiNumber = telephonyManager.getDeviceId();
-                    this.setmDeviceId(imeiNumber);
-
-                    //Toast.makeText(MainActivity.this,imeiNumber,Toast.LENGTH_LONG).show();
+                    Log.i("xcodar","onRequestPermissionsResult()");
+                    getPhonyId();
                 } else {
-
                     Toast.makeText(MainActivity.this,"Verificar Permissão!",Toast.LENGTH_LONG).show();
-                }
+                }*/
+
                 break;
             default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState){
@@ -185,55 +191,73 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getPhonyId() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED)
-            if (android.os.Build.VERSION.SDK_INT < 26) {
-                return telephonyManager.getDeviceId();
-            } else {
-                return telephonyManager.getMeid();
-            }
-
+        Log.i("xcodar","getPhonyId >>");
+        Log.i("xcodar","SDK:"+ android.os.Build.VERSION.SDK_INT);
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)
+            if (android.os.Build.VERSION.SDK_INT < 26) return telephonyManager.get().getDeviceId();
+            else return telephonyManager.get().getImei();
+        Log.i("xcodar","getPhonyId <<");
         return "+5581995922332";
     }
 
-    private void verifyStatusGps() {
-        /*  Não implementado! */
-    }
     private void requestPermission() {
         ActivityCompat.requestPermissions(MainActivity.this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                1);
+                mPermissions ,
+                101);
     }
 
     private void checkLocatioinGPS(){
         Log.i("xcodar","checkStatusGPS >>> ");
+        if (!gpsEnable()) {
+            messageToast(MainActivity.this, "Favor ativar o serviço de localização(GPS)!",7 );
+            //messageToast(MainActivity.this, "GPS Desativado!",5 );
+            return;
+        }
+        Log.i("xcodar","GPS Ativado! ");
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
-            Log.i("xcodar","return <<<< ");
+            Log.i("xcodar","checkSelfPermission return <<<< ");
             return;
         }
-        Task<Location> task;
-        task = fusedLocationProviderClient.getLastLocation();
+        Log.i("xcodar","task");
+        Task task = fusedLocationProviderClient.getLastLocation();
         task.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if(location != null) {
                    setmLatitude(Double.toString(location.getLatitude()));
                    setmLongitude(Double.toString(location.getLongitude()));
+                   setmDeviceId(getPhonyId());
                    SendLocation();
-                   CharSequence responseLocation = "Localidade LAT: " + location.getLatitude()+" LON: "+location.getLongitude();
+                   CharSequence responseLocation = "Imei: " + getmDeviceId()  + " Localidade LAT: " + location.getLatitude()+" LON: "+location.getLongitude();
                    messageToast(MainActivity.this, responseLocation,5 );
+                    Log.i("xcodar","Localidade" + getLongitude() +" "+ getLatitude());
                 }else
                 {
-                    messageToast(MainActivity.this, "Favor ativar o serviço de localização(GPS)!",5 );
+                    fusedLocationProviderClient = getFusedLocationProviderClient(MainActivity.this);
+                    messageToast(MainActivity.this, "Falha ao acessar a localização!",7 );
                 }
-                Log.i("xcodar","Localidade" + location.getLatitude()+" "+location.getLongitude());
             }
 
         });
         Log.i("xcodar","checkStatusGPS <<< ");
 
+    }
+
+    private boolean gpsEnable() {
+        try {
+            Log.i("xcodar","gpsEnable >>> ");
+            LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+            boolean result = service.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            return result;
+
+        }catch (Exception ex){
+            Log.i("xcodar","gpsEnable Erro:" + ex.getMessage());
+            return false;
+        }finally {
+            Log.i("xcodar","gpsEnable <<< ");
+        }
     }
 
     @Override
@@ -274,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("xcodar","SendLocation >>> ");
 
         try{
-            LocationDevice locationdevice = new LocationDevice(getDeviceId(),getLatitude(),getLongitude());
+            LocationDevice locationdevice = new LocationDevice(getmDeviceId(),getLatitude(),getLongitude());
 
             new LocationWebApi(this,locationdevice).execute();
 

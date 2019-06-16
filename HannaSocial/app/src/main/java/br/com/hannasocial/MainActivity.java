@@ -39,7 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private String mLatitude = "";
     private final ThreadLocal<TelephonyManager> telephonyManager = new ThreadLocal<TelephonyManager>();
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private String[] mPermissions ={Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_FINE_LOCATION };
+    private String[] mPermissions ={Manifest.permission.READ_PHONE_STATE,
+                                        Manifest.permission.ACCESS_FINE_LOCATION ,
+                                            Manifest.permission.ACCESS_COARSE_LOCATION};
     /* Componentes */
     private Button btnAnonimousAlert;
     private CheckBox chkBoxKeepAnonimous;
@@ -127,8 +129,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fusedLocationProviderClient = getFusedLocationProviderClient(this);
-
-
     }
 
     private void requestDeviceId() {
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("xcodar","checkStatusGPS >>> ");
         if (!gpsEnable()) {
             messageToast(MainActivity.this, "Favor ativar o serviço de localização(GPS)!",7 );
-            //messageToast(MainActivity.this, "GPS Desativado!",5 );
+            fusedLocationProviderClient.flushLocations();
             return;
         }
         Log.i("xcodar","GPS Ativado! ");
@@ -221,8 +221,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Log.i("xcodar","task");
-        Task task = fusedLocationProviderClient.getLastLocation();
-        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+        Task<Location> task = fusedLocationProviderClient.getLastLocation().addOnSuccessListener(
+                new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if(location != null) {
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("xcodar","Localidade" + getLongitude() +" "+ getLatitude());
                 }else
                 {
-                    fusedLocationProviderClient = getFusedLocationProviderClient(MainActivity.this);
+                    fusedLocationProviderClient.flushLocations();
                     messageToast(MainActivity.this, "Falha ao acessar a localização!",7 );
                 }
             }

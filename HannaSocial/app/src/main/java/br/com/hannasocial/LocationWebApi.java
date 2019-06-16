@@ -3,15 +3,11 @@ package br.com.hannasocial;
 import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -25,7 +21,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
     * DNS IPV4: ec2-18-222-248-86.us-east-2.compute.amazonaws.com
     * LOCAL: "http://192.168.11.3:3003/api/locationDevices"
     * */
-    public static final String server = "http://ec2-18-222-248-86.us-east-2.compute.amazonaws.com:3003/api/locationDevices";
+    public static final String server = "http://18.222.248.86:3003/api/locationDevices";
     private static final String mWebApi = server ;
     private Context mContext;
     private LocationDevice _locationdevice;
@@ -60,7 +56,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
     private boolean sendLocation(String methodHttp , LocationDevice location) {
         Log.i("xcodar","LocationApi.sendLocation >>>");
         boolean success = false;
-        String url = server;
+        String url = mWebApi;
         URL urlCon;
         HttpURLConnection client;
         BufferedReader reader = null;

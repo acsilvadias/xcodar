@@ -8,6 +8,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -24,11 +25,12 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import static com.google.android.gms.location.LocationServices.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     /* Verificar GPS*/
@@ -37,11 +39,33 @@ public class MainActivity extends AppCompatActivity {
     private String mDeviceId = "";
     private String mLongitude = "";
     private String mLatitude = "";
+    private String mLastLongitude = "";
+    private String mLastLatitude = "";
+
+    public String getmLastLongitude() {
+        return mLastLongitude;
+    }
+
+    public void setmLastLongitude(String mLastLongitude) {
+        this.mLastLongitude = mLastLongitude;
+    }
+
+    public String getmLastLatitude() {
+        return mLastLatitude;
+    }
+
+    public void setmLastLatitude(String mLastLatitude) {
+        this.mLastLatitude = mLastLatitude;
+    }
+
+
     private final ThreadLocal<TelephonyManager> telephonyManager = new ThreadLocal<TelephonyManager>();
     private FusedLocationProviderClient fusedLocationProviderClient;
     private String[] mPermissions ={Manifest.permission.READ_PHONE_STATE,
                                         Manifest.permission.ACCESS_FINE_LOCATION ,
                                             Manifest.permission.ACCESS_COARSE_LOCATION};
+    private Location mLastLocation;
+
     /* Componentes */
     private Button btnAnonimousAlert;
     private CheckBox chkBoxKeepAnonimous;
@@ -54,9 +78,7 @@ public class MainActivity extends AppCompatActivity {
     private void setmLongitude(String mLongitude) {
         this.mLongitude = mLongitude;
     }
-    private void setmLatitude(String mLatitude) {
-        this.mLatitude = mLatitude;
-    }
+    private void setmLatitude(String mLatitude) { this.mLatitude = mLatitude; }
 
     public MainActivity() {   }
     public String getLongitude() {
@@ -70,17 +92,22 @@ public class MainActivity extends AppCompatActivity {
     Handler mHandler;
     boolean mShowDialog;
 
+    public void Timer(){
+        Timer timer = new Timer();
+        TaskTimer taskTime = new TaskTimer();
+        timer.schedule(taskTime, 10000, 10000);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        requestPermission();
         requestDeviceId();
 
         mHandler = new Handler();
         mShowDialog = savedInstanceState == null;
 
-        setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -103,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-             checkLocatioinGPS();
+                getLastLocatioinGPS();
          }
         });
 
@@ -128,16 +155,39 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        fusedLocationProviderClient = getFusedLocationProviderClient(this);
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        Timer();
+    }
+
+    class TaskTimer extends TimerTask {
+
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i("xcodar","TimerTask()");
+                    getLastLocatioinGPS();
+                }
+            });
+        }
+    }
+    @Override
+    public void onStart(){
+        super.onStart();
+        Log.i("xcodar","onStart()");
+        requestPermission();
+        setmDeviceId(getPhonyId());
     }
 
     private void requestDeviceId() {
        telephonyManager.set((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE));
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+         /*
+         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
             Log.i("xcodar","return requestDeviceId()");
             return;
-        }
+        }*/
         Log.i("xcodar","requestDeviceId()");
     }
 
@@ -206,8 +256,8 @@ public class MainActivity extends AppCompatActivity {
                 101);
     }
 
-    private void checkLocatioinGPS(){
-        Log.i("xcodar","checkStatusGPS >>> ");
+    private void getLastLocatioinGPS(){
+        Log.i("xcodar","getLastLocatioinGPS >>> ");
         if (!gpsEnable()) {
             messageToast(MainActivity.this, "Favor ativar o serviço de localização(GPS)!",7 );
             fusedLocationProviderClient.flushLocations();
@@ -215,34 +265,33 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.i("xcodar","GPS Ativado! ");
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            Log.i("xcodar","checkSelfPermission return <<<< ");
-            return;
-        }
-        Log.i("xcodar","task");
-        Task<Location> task = fusedLocationProviderClient.getLastLocation().addOnSuccessListener(
-                new OnSuccessListener<Location>() {
+        fusedLocationProviderClient.getLastLocation()
+                .addOnCompleteListener(this, new OnCompleteListener<Location>() {
             @Override
-            public void onSuccess(Location location) {
-                if(location != null) {
-                   setmLatitude(Double.toString(location.getLatitude()));
-                   setmLongitude(Double.toString(location.getLongitude()));
-                   setmDeviceId(getPhonyId());
-                   SendLocation();
-                   CharSequence responseLocation = "Imei: " + getmDeviceId()  + " Localidade LAT: " + location.getLatitude()+" LON: "+location.getLongitude();
-                   messageToast(MainActivity.this, responseLocation,5 );
-                    Log.i("xcodar","Localidade" + getLongitude() +" "+ getLatitude());
-                }else
+            public void onComplete(@NonNull Task<Location> task){
+                if ( task.isSuccessful() && task.getResult() != null)
                 {
-                    fusedLocationProviderClient.flushLocations();
-                    messageToast(MainActivity.this, "Falha ao acessar a localização!",7 );
-                }
+                    mLastLocation = task.getResult();
+                    setmLatitude(Double.toString(mLastLocation.getLatitude()));
+                    setmLongitude(Double.toString(mLastLocation.getLongitude()));
+
+                    if (getmLastLatitude().equals(getLatitude()) && getmLastLongitude().equals(getLongitude()))
+                    {   Log.i("xcodar","Localidade" + getLongitude() +" "+ getLatitude());
+                        return;
+                    }
+                    SendLocation();
+                    setmLastLatitude(getLatitude());
+                    setmLastLongitude(getLongitude());
+                    CharSequence responseLocation = "Imei: " + getmDeviceId()  + " Localidade LAT: " + getLatitude()+" LON: "+getLongitude();
+                    messageToast(MainActivity.this, responseLocation,5 );
+                    Log.i("xcodar","Localidade" + getLongitude() +" "+ getLatitude());
+
+            }else{
+                    messageToast(MainActivity.this, "Falha ao acessar a localização!"+ task.getException(),7 );
             }
-
+                }
         });
-        Log.i("xcodar","checkStatusGPS <<< ");
-
+        Log.i("xcodar","getLastLocatioinGPS <<< ");
     }
 
     private boolean gpsEnable() {
@@ -307,6 +356,6 @@ public class MainActivity extends AppCompatActivity {
         }finally {
             Log.i("xcodar","SendLocation <<< ");
         }
-
     }
+
 }

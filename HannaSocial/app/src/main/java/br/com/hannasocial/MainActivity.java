@@ -42,6 +42,16 @@ public class MainActivity extends AppCompatActivity {
     private String mLastLongitude = "";
     private String mLastLatitude = "";
 
+    public String getmObjId() {
+        return mObjId;
+    }
+
+    public void setmObjId(String mObjId) {
+        this.mObjId = mObjId;
+    }
+
+    private String mObjId = "";
+
     public String getmLastLongitude() {
         return mLastLongitude;
     }
@@ -276,15 +286,18 @@ public class MainActivity extends AppCompatActivity {
                     setmLongitude(Double.toString(mLastLocation.getLongitude()));
 
                     if (getmLastLatitude().equals(getLatitude()) && getmLastLongitude().equals(getLongitude()))
-                    {   Log.i("xcodar","Localidade" + getLongitude() +" "+ getLatitude());
+                    {
+                        Log.i("xcodar","Nâo Atualizar!");
+                        CharSequence responseLocation =  "ObjId: " + getmObjId()  + " Imei: " + getmDeviceId()  + " Localidade LAT: " + getLatitude()+" LON: "+getLongitude();
+                        Log.i("xcodar", responseLocation.toString() );
                         return;
                     }
                     SendLocation();
                     setmLastLatitude(getLatitude());
                     setmLastLongitude(getLongitude());
-                    CharSequence responseLocation = "Imei: " + getmDeviceId()  + " Localidade LAT: " + getLatitude()+" LON: "+getLongitude();
+                    CharSequence responseLocation =  "ObjId: " + getmObjId()  + " Imei: " + getmDeviceId()  + " Localidade LAT: " + getLatitude()+" LON: "+getLongitude();
                     messageToast(MainActivity.this, responseLocation,5 );
-                    Log.i("xcodar","Localidade" + getLongitude() +" "+ getLatitude());
+                    Log.i("xcodar",responseLocation.toString());
 
             }else{
                     messageToast(MainActivity.this, "Falha ao acessar a localização!"+ task.getException(),7 );

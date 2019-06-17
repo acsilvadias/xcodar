@@ -21,27 +21,29 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
     * DNS IPV4: ec2-18-222-248-86.us-east-2.compute.amazonaws.com
     * LOCAL: "http://192.168.11.3:3003/api/locationDevices"
     * */
+    private String methodHttp = "POST";
+
     public static final String server = "http://18.222.248.86:3003/api/locationDevices";
     private static final String mWebApi = server ;
-    private Context mContext;
+    private MainActivity mContext;
     private LocationDevice _locationdevice;
-
     @Override
     protected Void doInBackground(LocationDevice... locationDevices) {
         canyouhelpme(_locationdevice);
         return null;
     }
 
-    public LocationWebApi(Context ctx, LocationDevice locationdevice ){
+    public LocationWebApi(MainActivity ctx, LocationDevice locationdevice ){
         mContext = ctx;
         _locationdevice = locationdevice;
-    }
+     }
 
     public void canyouhelpme(LocationDevice locationdevice)  {
         Log.i("xcodar","canyouhelpme >>>");
        try{
 
-           if (sendLocation("POST", locationdevice)  ){
+            if (locationdevice.get_objId() != null){methodHttp = "PUT"; }
+           if (sendLocation(methodHttp, locationdevice)  ){
                Log.i("xcodar","Success!");
            }else{
                Log.i("xcodar","Fail!");
@@ -62,6 +64,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
         BufferedReader reader = null;
 
         try {
+            if (methodHttp.equals("PUT")){url += "/" +location.get_objId();}
             urlCon = new URL(url);
             client = (HttpURLConnection) urlCon.openConnection();
             client.setReadTimeout(10000);
@@ -89,6 +92,9 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
                     sb.append(line + "\n");
                 }
                 Log.i("xcodar",sb.toString());
+                JSONObject jo = new JSONObject(sb.toString());
+                mContext.setmObjId(jo.getString("_id"));
+
             }
 
             Log.i( "xcodar", Integer.toString(client.getResponseCode()));

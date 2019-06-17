@@ -1,5 +1,7 @@
 const LocationDevice = require('./locationDevice')
 
-LocationDevice.methods(['get','post','put','delete'])
+
+LocationDevice.methods(['post','get','put','delete'])
+LocationDevice.updateOptions({new: true, runValidators: true})
 
 module.exports = LocationDevice

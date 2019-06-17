@@ -9,7 +9,7 @@ local: mongodb://localhost:27017/db_hannasocial
 	*/
 
 
-module.exports = mongoose.connect("mongodb+srv://hannaUserdb:H@nna2019.1@cluster0-jryiw.mongodb.net/db_hannasocial?retryWrites=true&w=majority"  ,
+module.exports = mongoose.connect("mongodb+srv://hannaUserdb:RJuZL7jbj2CUftBC@cluster0-jryiw.mongodb.net/db_hannasocial?retryWrites=true&w=majority"  ,
    { useNewUrlParser: true }
    , err => {
     if (err) {

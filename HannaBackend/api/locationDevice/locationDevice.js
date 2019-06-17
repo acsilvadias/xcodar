@@ -2,7 +2,7 @@ const restful = require('node-restful')
 const mongoose = restful.mongoose
 
 const docLocationSchema = new mongoose.Schema({
-    deviceId: {type: String, required: true },
+    deviceId: {type: String, required: [true, "deviceId é obrigatório!"] },
     longitude: {type: Number , required: true },
     latitude: {type: Number, required: true },
     dataTimeLocation: {type: Date , required: true },

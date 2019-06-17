@@ -1,6 +1,7 @@
 package br.com.hannasocial;
 
 public class LocationDevice {
+    private String _objId;
     private String _deviceId;
     private String _latitude;
     private String _longitude;
@@ -38,4 +39,7 @@ public class LocationDevice {
         this._longitude = longitude;
     }
 
+    public String get_objId() { return _objId; }
+
+    public void set_objId(String _objId) { this._objId = _objId; }
 }

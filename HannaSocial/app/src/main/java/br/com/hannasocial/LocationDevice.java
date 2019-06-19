@@ -9,10 +9,11 @@ public class LocationDevice {
     public LocationDevice() {
 
     }
-    public LocationDevice(String deviceId, String latitude, String longitude) {
+    public LocationDevice(String deviceId, String latitude, String longitude,String objid) {
         this._deviceId = deviceId;
         this._latitude = latitude;
         this._longitude = longitude;
+        this._objId = objid;
     }
 
     public String get_deviceId() {

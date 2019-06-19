@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 	psw:  H@nna2019.1
 	atlas: mongodb+srv://hannaUserdb:<password>@cluster0-jryiw.mongodb.net/test?retryWrites=true&w=majority
  
- atlasDB: "mongodb+srv://hannaUserdb:H@nna2019.1@cluster0-jryiw.mongodb.net/db_hannasocial?retryWrites=true&w=majority" 
+ atlasDB: "mongodb+srv://hannaUserdb:RJuZL7jbj2CUftBC@cluster0-jryiw.mongodb.net/db_hannasocial?retryWrites=true&w=majority" 
 local: mongodb://localhost:27017/db_hannasocial
 	*/
 

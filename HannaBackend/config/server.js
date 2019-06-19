@@ -8,7 +8,7 @@ server.use(bodyParser.urlencoded({ extended: true }))
 server.use(bodyParser.json())
 
 server.use((req, res, next) => {
-	console.log('Datdos recebidos ' + JSON.stringify(req.body, null, 2))
+	//console.log('Datdos recebidos ' + JSON.stringify(req.body, null, 2))
 	next()
 })
 

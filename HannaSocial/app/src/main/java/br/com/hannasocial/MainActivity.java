@@ -34,6 +34,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     /* Verificar GPS*/
+    MainActivity instance;
     private static final int REQUEST_CHECK_GPS = 2;
     private static final String EXTRA_DIALOG = "dialog";
     private String mDeviceId = "";
@@ -90,7 +91,9 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setmLatitude(String mLatitude) { this.mLatitude = mLatitude; }
 
-    public MainActivity() {   }
+    public MainActivity() {
+        instance = this;
+    }
     public String getLongitude() {
         return mLongitude;
     }
@@ -140,7 +143,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                SendLocation();
+                messageToast(getApplicationContext(), "Solicitação de ajuda enviada!", 5);
+                /*
                 getLastLocatioinGPS();
+                 */
          }
         });
 
@@ -295,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                     SendLocation();
                     setmLastLatitude(getLatitude());
                     setmLastLongitude(getLongitude());
-                    CharSequence responseLocation =  "ObjId: " + getmObjId()  + " Imei: " + getmDeviceId()  + " Localidade LAT: " + getLatitude()+" LON: "+getLongitude();
+                    CharSequence responseLocation =  "ObjId: " + getmObjId()  + " Imei: " + getmDeviceId()  + " Localidade LAT: " + getLatitude()+" LON: "+getLongitude();;
                     messageToast(MainActivity.this, responseLocation,5 );
                     Log.i("xcodar",responseLocation.toString());
 
@@ -360,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("xcodar","SendLocation >>> ");
 
         try{
-            LocationDevice locationdevice = new LocationDevice(getmDeviceId(),getLatitude(),getLongitude());
+            LocationDevice locationdevice = new LocationDevice(getmDeviceId(),getLatitude(),getLongitude(),getmObjId());
 
             new LocationWebApi(this,locationdevice).execute();
 

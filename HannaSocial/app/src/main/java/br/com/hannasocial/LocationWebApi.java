@@ -42,7 +42,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
         Log.i("xcodar","canyouhelpme >>>");
        try{
 
-            if (locationdevice.get_objId() != null){methodHttp = "PUT"; }
+          if (locationdevice.get_objId() != null){methodHttp = "PUT"; }
            if (sendLocation(methodHttp, locationdevice)  ){
                Log.i("xcodar","Success!");
            }else{
@@ -64,7 +64,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
         BufferedReader reader = null;
 
         try {
-            if (methodHttp.equals("PUT")){url += "/" +location.get_objId();}
+            if(methodHttp.equals("PUT")){url += "/:id"; }
             urlCon = new URL(url);
             client = (HttpURLConnection) urlCon.openConnection();
             client.setReadTimeout(10000);

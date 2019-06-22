@@ -35,7 +35,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:contentDescription="@string/btn_anonimousAlert"
-        android:radius="10dp"
+        android:radius="15dp"
         android:text="@string/btn_anonimousAlert"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

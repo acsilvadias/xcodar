@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                SendLocation();
+                GetHelp();
                 messageToast(getApplicationContext(), "Solicitação de ajuda enviada!", 5);
                 /*
                 getLastLocatioinGPS();
@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
                     setmLatitude(Double.toString(mLastLocation.getLatitude()));
                     setmLongitude(Double.toString(mLastLocation.getLongitude()));
 
-                    if (getmLastLatitude().equals(getLatitude()) && getmLastLongitude().equals(getLongitude()))
+                    if (!getmLastLatitude().equals(getLatitude()) && getmLastLongitude().equals(getLongitude()))
                     {
                         Log.i("xcodar","Nâo Atualizar!");
                         CharSequence responseLocation =  "ObjId: " + getmObjId()  + " Imei: " + getmDeviceId()  + " Localidade LAT: " + getLatitude()+" LON: "+getLongitude();
@@ -361,7 +361,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /* Enviar e consumir api rest */
-
     protected void SendLocation() {
 
         Log.i("xcodar","SendLocation >>> ");
@@ -378,4 +377,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    protected void GetHelp() {
+
+        Log.i("xcodar","GetHelp >>> ");
+
+        try{
+            LocationDevice locationdevice = new LocationDevice(getmDeviceId(),getLatitude(),getLongitude(),getmObjId());
+
+            new HelpWebApi(this,locationdevice).execute();
+
+        }catch (Exception e){
+            Log.i("xcodar","Error SendLocation: " + e.getMessage());
+        }finally {
+            Log.i("xcodar","GetHelp <<< ");
+        }
+    }
 }

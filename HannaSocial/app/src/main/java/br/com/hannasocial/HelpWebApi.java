@@ -1,8 +1,11 @@
 package br.com.hannasocial;
 
-import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -11,19 +14,16 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Locale;
 
-import android.os.AsyncTask;
-import android.util.Log;
+import static java.util.Calendar.getInstance;
 
-import static java.util.Calendar.*;
-
-public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>        {
+public class HelpWebApi extends AsyncTask<LocationDevice, Void, Void> {
     /*
-    * DNS IPV4: ec2-18-222-248-86.us-east-2.compute.amazonaws.com
-    * LOCAL: "http://192.168.11.3:3003/api/locationDevices"
-    * */
+     * DNS IPV4: ec2-18-222-248-86.us-east-2.compute.amazonaws.com
+     * LOCAL: "http://192.168.11.3:3003/api/locationDevices"
+     * */
     private String methodHttp = "POST";
 
-    public static final String server = "http://18.222.248.86:3003/api/locationDevices";
+    public static final String server = "http://18.222.248.86:3003/api/helpDevices";
     private static final String mWebApi = server ;
     private MainActivity mContext;
     private LocationDevice _locationdevice;
@@ -33,29 +33,29 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
         return null;
     }
 
-    public LocationWebApi(MainActivity ctx, LocationDevice locationdevice ){
+    public HelpWebApi(MainActivity ctx, LocationDevice locationdevice ){
         mContext = ctx;
         _locationdevice = locationdevice;
-     }
+    }
 
     public void canyouhelpme(LocationDevice locationdevice)  {
         Log.i("xcodar","canyouhelpme >>>");
-       try{
-          //if (locationdevice.get_objId() != null){methodHttp = "PUT"; }
-           if (sendLocation(methodHttp, locationdevice)  ){
-               Log.i("xcodar","Success!");
-           }else{
-               Log.i("xcodar","Fail!");
-           }
-       }catch (Exception e){
-           Log.i("xcodar"," Erro:  "+e.getMessage());
-       }finally {
-           Log.i("xcodar","canyouhelpme <<<<");
-       }
+        try{
+            //if (locationdevice.get_objId() != null){methodHttp = "PUT"; }
+            if (sendLocation(methodHttp, locationdevice)  ){
+                Log.i("xcodar","Success!");
+            }else{
+                Log.i("xcodar","Fail!");
+            }
+        }catch (Exception e){
+            Log.i("xcodar"," Erro:  "+e.getMessage());
+        }finally {
+            Log.i("xcodar","canyouhelpme <<<<");
+        }
     }
 
     private boolean sendLocation(String methodHttp , LocationDevice location) {
-        Log.i("xcodar","LocationApi.sendLocation >>>");
+        Log.i("xcodar","HelpWebApi.sendLocation >>>");
         boolean success = false;
         String url = mWebApi;
         URL urlCon;
@@ -98,7 +98,6 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
 
             Log.i( "xcodar", Integer.toString(client.getResponseCode()));
 
-
             client.disconnect();
             outputPost.close();
             success = true;
@@ -106,7 +105,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
             Log.i("xcodar","Error: " + e.getMessage());
             return success;
         }finally {
-            Log.i("xcodar","LocationApi.sendLocation <<<");
+            Log.i("xcodar","HelpWebApi.sendLocation <<<");
             return success;
         }
 
@@ -118,17 +117,13 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
 
         Locale local = new Locale("pt", "BR");
         Date currentTime = getInstance(local).getTime();
-        jo.put("deviceId", location.get_deviceId());
-        jo.put("longitude", location.get_longitude());
-        jo.put("latitude", location.get_latitude());
-        jo.put("dataTimeLocation", currentTime.toString());
+        jo.put("locationDeviceId", location.get_deviceId());
         jo.put("location.type", "Point");
         jo.accumulate( "location.coordinates", location.get_longitude() );
         jo.accumulate( "location.coordinates", location.get_latitude() );
-
+        jo.accumulate("snConfirma","n");
         String json = jo.toString();
         return json.getBytes();
-
     }
 
 

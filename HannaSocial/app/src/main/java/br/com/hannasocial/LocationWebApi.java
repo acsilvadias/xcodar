@@ -92,7 +92,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
                 }
                 Log.i("xcodar",sb.toString());
                 JSONObject jo = new JSONObject(sb.toString());
-                mContext.setmObjId(jo.getString("_id"));
+                mContext.setObjId(jo.getString("_id"));
 
             }
 

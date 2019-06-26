@@ -6,13 +6,15 @@ module.exports = function(server){
 	const router = express.Router()
 	server.use(function ( req, res ,next) { 
 		var mBody ='Datdos recebidos ' + JSON.stringify(req.body, null, 2);
-		var mReq = "url: " + req.baseUrl;
+		var mReq = "url: " + req.originalUrl;
 		console.log(mBody)
 		console.log(mReq)
-		console.log(req.originalUrl) // '/admin/new'
-		console.log(req.baseUrl) // '/admin'
-		console.log(req.path) // '/new'
-		next() 
+		/*
+		console.log(req.originalUrl) 
+		console.log(req.baseUrl)
+		console.log(req.path) 
+		*/
+		next() 	
 	})
 	server.use('/api',router)
 
@@ -24,5 +26,7 @@ module.exports = function(server){
 	const helpDeviceService = require('../api/helpDevice/helpDeviceService')
 	helpDeviceService.register(router,'/helpDevices')
 	console.log('helpDevices Registrado! ')
+
+	
 }
 	

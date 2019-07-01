@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "962868013715",
+    "firebase_url": "https://helphanna.firebaseio.com",
+    "project_id": "helphanna",
+    "storage_bucket": "helphanna.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962868013715:android:35e75ef591648f8d",
+        "android_client_info": {
+          "package_name": "br.com.hannasocial"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "962868013715-1ngvggsbdbcn1advhm2lkcfun24hnbbg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4-6pLaZhFhUWVEmT-jq82pin0Hv9Gqfs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "962868013715-1ngvggsbdbcn1advhm2lkcfun24hnbbg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

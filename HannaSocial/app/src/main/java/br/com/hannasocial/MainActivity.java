@@ -15,13 +15,13 @@ import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
+import androidx.annotation.NonNull;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.ActivityCompat;
 
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -41,7 +41,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.IllegalFormatCodePointException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -172,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
         btnAnonimousAlert = (Button) findViewById(R.id.btn_anonimousAlert);
         chkBoxKeepAnonimous = (CheckBox) findViewById(R.id.chkBoxKeepAnonimous);
         chkBoxBeAvailable = (CheckBox) findViewById(R.id.chkBoxBeAvailable);
-        txtViewPeoplesAvailable = (TextView) findViewById(R.id.txtViewPeoplesAvailable);
+        //txtViewPeoplesAvailable = (TextView) findViewById(R.id.txtViewPeoplesAvailable);
 
         String string = getIntent().getStringExtra(EXTRA_TEXTO);
         TextView txt = findViewById(R.id.txtDetail);

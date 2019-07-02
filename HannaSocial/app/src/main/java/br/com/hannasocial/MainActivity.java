@@ -40,6 +40,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -47,6 +49,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
     /* Verificar GPS*/
     MainActivity instance;
+    private static final String TAG = "xcodar";
     private static final int REQUEST_CHECK_GPS = 2;
     private static final String EXTRA_DIALOG = "dialog";
     private String mDeviceId = "";
@@ -56,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private String mLastLatitude = "";
     private String mObjId = "";
     private boolean onUpdate;
-
     private String mRegistrationId = "";
+    private String mToken = "";
 
     public String getmObjId() {
         return mObjId;
@@ -176,6 +179,18 @@ public class MainActivity extends AppCompatActivity {
         String string = getIntent().getStringExtra(EXTRA_TEXTO);
         TextView txt = findViewById(R.id.txtDetail);
         txt.setText(string);
+
+        TextView txtToken = findViewById(R.id.txtToken);
+       // mToken = FirebaseInstanceId.getInstance().getToken(" ",null);
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener( this,  new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                mToken = instanceIdResult.getToken();
+                Log.i(TAG,"Token: " + mToken);
+            }
+        });
+
+        Log.i(TAG,"Token: " + mToken);
 
         locationRequest = new LocationRequest();
         locationRequest.setInterval(75000);

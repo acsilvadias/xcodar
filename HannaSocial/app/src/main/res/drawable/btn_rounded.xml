@@ -11,5 +11,4 @@
         <solid android:color="@color/HannaBtnColor"/>
     </stroke>
     <cornes android:radius="25dp"/>
-
 </shape>

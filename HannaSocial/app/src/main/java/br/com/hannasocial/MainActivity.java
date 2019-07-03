@@ -42,6 +42,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -139,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int NOTIFICATION_BIG = 3;
     private static final String NOTIFICATION_TITLE = "Ajude-mee!";
     private static final String NOTIFICATION_TEXT = "Por favor, estou precisando de ajuda, estou próximo(a) de você!";
-
 
     MyReceiver mReceiver;
 
@@ -316,13 +316,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestDeviceId() {
         telephonyManager.set((TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE));
-         /*
-         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 101);
-            Log.i("xcodar","return requestDeviceId()");
-            return;
-        }*/
-        Log.i("xcodar", "requestDeviceId()");
+         Log.i("xcodar", "requestDeviceId()");
     }
 
     @Override
@@ -556,4 +550,5 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
 }

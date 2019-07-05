@@ -4,7 +4,7 @@
     <gradient
         android:angle="225"
         android:endColor="@color/HannaBtnColor"
-        android:gradientRadius="30dp"
+        android:gradientRadius="1dp"
         android:type="radial"
         android:startColor="@color/wallet_highlighted_text_holo_dark" />
     <stroke>

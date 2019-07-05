@@ -8,7 +8,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.Map;
 
 public class LatestFirebaseMessagingService extends FirebaseMessagingService {
-    @Override
+     @Override
     public void onNewToken(String mToken) {
         super.onNewToken(mToken);
         Log.e("xcodar", "Token: "+mToken);
@@ -19,14 +19,15 @@ public class LatestFirebaseMessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
         Log.e("xcodar", "Message: "+String.valueOf(remoteMessage.getData()));
         Map<String, String> data = remoteMessage.getData();
-        Log.e("xcodar", "title: "+data.get("pinpoint.notification.title"));
-        Log.e("xcodar", "body: "+data.get("pinpoint.notification.body"));
+        Log.e("xcodar", "title: "+remoteMessage.getNotification().getTitle());
+        Log.e("xcodar", "body: "+remoteMessage.getNotification().getBody());
 
         if (remoteMessage.getNotification() != null){
+
             NotificationUtils.createNotificationSimple(
                     this,
-                    remoteMessage.getNotification().getTitle(),
-                    remoteMessage.getNotification().getBody()
+                    remoteMessage.getNotification().getBody(),
+                    remoteMessage.getNotification().getTitle()
             );
         }
     }

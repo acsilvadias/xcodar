@@ -27,6 +27,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
     private static final String mWebApi = server ;
     private MainActivity mContext;
     private LocationDevice _locationdevice;
+
     @Override
     protected Void doInBackground(LocationDevice... locationDevices) {
         canyouhelpme(_locationdevice);
@@ -41,8 +42,8 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
     public void canyouhelpme(LocationDevice locationdevice)  {
         Log.i("xcodar","canyouhelpme >>>");
        try{
-          //if (locationdevice.get_objId() != null){methodHttp = "PUT"; }
-           if (sendLocation(methodHttp, locationdevice)  ){
+           if (locationdevice.get_objId().length() > 0  ) {methodHttp = "PUT"; }
+           if (sendLocation(methodHttp, locationdevice)){
                Log.i("xcodar","Success!");
            }else{
                Log.i("xcodar","Fail!");
@@ -63,7 +64,8 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
         BufferedReader reader = null;
 
         try {
-            if(methodHttp.equals("PUT")){url += "/:id"; }
+            if(methodHttp.equals("PUT")){url += "/?id="+location.get_objId(); }
+            Log.i("xcodar","url: "+url );
             urlCon = new URL(url);
             client = (HttpURLConnection) urlCon.openConnection();
             client.setReadTimeout(10000);
@@ -93,7 +95,6 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
                 Log.i("xcodar",sb.toString());
                 JSONObject jo = new JSONObject(sb.toString());
                 mContext.setObjId(jo.getString("_id"));
-
             }
 
             Log.i( "xcodar", Integer.toString(client.getResponseCode()));
@@ -102,6 +103,7 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
             client.disconnect();
             outputPost.close();
             success = true;
+
         }catch (Exception e){
             Log.i("xcodar","Error: " + e.getMessage());
             return success;
@@ -125,12 +127,10 @@ public class LocationWebApi extends AsyncTask<LocationDevice, Void, Void>       
         jo.put("location.type", "Point");
         jo.accumulate( "location.coordinates", location.get_longitude() );
         jo.accumulate( "location.coordinates", location.get_latitude() );
-
+        jo.put("token",location.get_token());
         String json = jo.toString();
         return json.getBytes();
 
     }
-
-
 
 }

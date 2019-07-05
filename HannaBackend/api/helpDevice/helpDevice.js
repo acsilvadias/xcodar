@@ -26,5 +26,17 @@ const docHelpDeviceSchema = new mongoose.Schema({
 
 });
 
+const docdevicesNearSchema = new mongoose.Schema({
+    helpLocation: {
+        type: {
+          type : String,
+          enum: ['Point'],
+           required: false
+      }, coordinates: {
+          type: [Number],
+          required: false
+      }}
+});
+
 
 module.exports = restful.model('helpDevice', docHelpDeviceSchema )

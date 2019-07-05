@@ -21,6 +21,7 @@ public class HelpWebApi extends AsyncTask<LocationDevice, Void, Void> {
      * DNS IPV4: ec2-18-222-248-86.us-east-2.compute.amazonaws.com
      * LOCAL: "http://192.168.11.3:3003/api/locationDevices"
      * */
+    private String TAG = "xcodar";
     private String methodHttp = "POST";
 
     public static final String server = "http://18.222.248.86:3003/api/helpDevices";
@@ -39,18 +40,18 @@ public class HelpWebApi extends AsyncTask<LocationDevice, Void, Void> {
     }
 
     public void canyouhelpme(LocationDevice locationdevice)  {
-        Log.i("xcodar","canyouhelpme >>>");
+        Log.i(TAG,"canyouhelpme >>>");
         try{
             //if (locationdevice.get_objId() != null){methodHttp = "PUT"; }
             if (sendLocation(methodHttp, locationdevice)  ){
-                Log.i("xcodar","Success!");
+                Log.i(TAG,"Success!");
             }else{
-                Log.i("xcodar","Fail!");
+                Log.i(TAG,"Fail!");
             }
         }catch (Exception e){
-            Log.i("xcodar"," Erro:  "+e.getMessage());
+            Log.i(TAG," Erro:  "+e.getMessage());
         }finally {
-            Log.i("xcodar","canyouhelpme <<<<");
+            Log.i(TAG,"canyouhelpme <<<<");
         }
     }
 
@@ -81,6 +82,7 @@ public class HelpWebApi extends AsyncTask<LocationDevice, Void, Void> {
             outputPost.write(writeStream(outputPost, location));
             outputPost.flush();
 
+            Log.i("xcodar","body: " + outputPost.toString());
             if (client.getResponseCode() == HttpURLConnection.HTTP_CREATED){
                 reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 StringBuilder sb = new StringBuilder();
@@ -93,9 +95,7 @@ public class HelpWebApi extends AsyncTask<LocationDevice, Void, Void> {
                 Log.i("xcodar",sb.toString());
                 JSONObject jo = new JSONObject(sb.toString());
                 mContext.setObjId(jo.getString("_id"));
-
             }
-
             Log.i( "xcodar", Integer.toString(client.getResponseCode()));
 
             client.disconnect();
@@ -122,6 +122,7 @@ public class HelpWebApi extends AsyncTask<LocationDevice, Void, Void> {
         jo.accumulate( "location.coordinates", location.get_longitude() );
         jo.accumulate( "location.coordinates", location.get_latitude() );
         jo.accumulate("snConfirma","n");
+        jo.put("token",location.get_token());
         String json = jo.toString();
         return json.getBytes();
     }

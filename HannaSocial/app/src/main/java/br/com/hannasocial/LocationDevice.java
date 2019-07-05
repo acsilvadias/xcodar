@@ -5,16 +5,22 @@ public class LocationDevice {
     private String _deviceId;
     private String _latitude;
     private String _longitude;
+    private String _token;
 
     public LocationDevice() {
 
     }
-    public LocationDevice(String deviceId, String latitude, String longitude,String objid) {
+    public LocationDevice(String deviceId, String latitude, String longitude,String objid, String token) {
         this._deviceId = deviceId;
         this._latitude = latitude;
         this._longitude = longitude;
         this._objId = objid;
+        this._token = token;
     }
+
+    public String get_token() {return _token;}
+
+    public void set_token(String _token) {this._token = _token;}
 
     public String get_deviceId() {
         return _deviceId;

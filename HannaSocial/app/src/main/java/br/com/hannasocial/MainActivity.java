@@ -63,6 +63,10 @@ public class MainActivity extends AppCompatActivity {
     private String mRegistrationId = "";
     private String mToken = "";
 
+    public String getToken() {  return mToken;   }
+    public void setToken(String token) {
+        this.mToken = token;
+    }
     public String getmObjId() {
         return mObjId;
     }
@@ -99,7 +103,10 @@ public class MainActivity extends AppCompatActivity {
     private Button btnAnonimousAlert;
     private CheckBox chkBoxKeepAnonimous;
     private CheckBox chkBoxBeAvailable;
-    private TextView txtViewPeoplesAvailable;
+    private TextView txtViewMessage;
+    private Button btnYes;
+    private Button btnNo;
+
 
     private void setmDeviceId(String mDeviceId) {
         this.mDeviceId = mDeviceId;
@@ -132,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
         TaskTimer taskTime = new TaskTimer();
         timer.schedule(taskTime, 10000, 10000);
     }
-
 
     /*  Notification */
     private static final int NOTIFICATION_SIMPLE = 1;
@@ -174,23 +180,25 @@ public class MainActivity extends AppCompatActivity {
         btnAnonimousAlert = (Button) findViewById(R.id.btn_anonimousAlert);
         chkBoxKeepAnonimous = (CheckBox) findViewById(R.id.chkBoxKeepAnonimous);
         chkBoxBeAvailable = (CheckBox) findViewById(R.id.chkBoxBeAvailable);
-        //txtViewPeoplesAvailable = (TextView) findViewById(R.id.txtViewPeoplesAvailable);
+        txtViewMessage = (TextView) findViewById(R.id.txtFindIncident);
+        btnYes = (Button) findViewById(R.id.btnYes);
+        btnNo = (Button) findViewById(R.id.btnNo);
 
         String string = getIntent().getStringExtra(EXTRA_TEXTO);
         TextView txt = findViewById(R.id.txtDetail);
         txt.setText(string);
 
-        TextView txtToken = findViewById(R.id.txtToken);
+//        TextView txtToken = findViewById(R.id.txtToken);
        // mToken = FirebaseInstanceId.getInstance().getToken(" ",null);
         FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener( this,  new OnSuccessListener<InstanceIdResult>() {
             @Override
             public void onSuccess(InstanceIdResult instanceIdResult) {
-                mToken = instanceIdResult.getToken();
-                Log.i(TAG,"Token: " + mToken);
+               setToken(instanceIdResult.getToken());
+                Log.i(TAG,"Token: " + getToken());
             }
         });
 
-        Log.i(TAG,"Token: " + mToken);
+        Log.i(TAG,"Token: " + getToken());
 
         locationRequest = new LocationRequest();
         locationRequest.setInterval(75000);
@@ -477,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
     protected void SendLocation() {
         Log.i("xcodar", "SendLocation >>> ");
         try {
-            LocationDevice locationdevice = new LocationDevice(getmDeviceId(), getLatitude(), getLongitude(), getmObjId());
+            LocationDevice locationdevice = new LocationDevice(getmDeviceId(), getLatitude(), getLongitude(), getmObjId(),getToken());
 
             new LocationWebApi(this, locationdevice).execute();
 
@@ -491,7 +499,7 @@ public class MainActivity extends AppCompatActivity {
     protected void GetHelp() {
         Log.i("xcodar", "GetHelp >>> ");
         try {
-            LocationDevice locationdevice = new LocationDevice(getmDeviceId(), getLatitude(), getLongitude(), getmObjId());
+            LocationDevice locationdevice = new LocationDevice(getmDeviceId(), getLatitude(), getLongitude(), getmObjId() ,getToken());
             new HelpWebApi(this, locationdevice).execute();
         } catch (Exception e) {
             Log.i("xcodar", "Error SendLocation: " + e.getMessage());

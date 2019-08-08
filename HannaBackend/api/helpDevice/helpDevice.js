@@ -12,7 +12,7 @@ const docHelpDeviceSchema = new mongoose.Schema({
           type: [Number],
           required: true
       }},
-    helpDeviceId: {type: String, required:true },
+    helpDeviceId: {type: String, required:false },
     helpLocation: {
         type: {
           type : String,

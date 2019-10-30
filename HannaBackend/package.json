@@ -13,7 +13,7 @@
     "express": "^4.17.1",
     "fcm-node": "^1.5.1",
     "mongodb": "^3.2.6",
-    "mongoose": "^5.5.12",
+    "mongoose": "^5.7.5",
     "node-restful": "^0.2.6"
   },
   "devDependencies": {
